@@ -1,0 +1,14 @@
+Challenge Status:
+============================================================
+typosquattingNpmChallenge: SOLVED
+typosquattingAngularChallenge: SOLVED
+killChatbotChallenge: NOT SOLVED
+dlpPasswordSprayingChallenge: SOLVED
+retrieveBlueprintChallenge: SOLVED
+supplyChainAttackChallenge: SOLVED
+twoFactorAuthUnsafeSecretStorageChallenge: NOT SOLVED
+jwtUnsignedChallenge: SOLVED
+dataExportChallenge: NOT SOLVED
+dlpPastebinDataLeakChallenge: SOLVED
+hiddenImageChallenge: SOLVED
+knownVulnerableComponentChallenge: SOLVED
