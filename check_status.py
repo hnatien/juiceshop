@@ -1,28 +1,26 @@
 import requests
 
-challenges_to_check = [
-    'typosquattingNpmChallenge',      
-    'typosquattingAngularChallenge',  
-    'killChatbotChallenge',           
-    'dlpPasswordSprayingChallenge',   
-    'retrieveBlueprintChallenge',     
-    'supplyChainAttackChallenge',     
-    'twoFactorAuthUnsafeSecretStorageChallenge',
-    'jwtUnsignedChallenge',           
-    'dataExportChallenge',            
-    'dlpPastebinDataLeakChallenge',   
-    'hiddenImageChallenge',           
-    'knownVulnerableComponentChallenge'
-]
+def check_status():
+    server = "http://localhost:3000"
+    try:
+        r = requests.get(f"{server}/api/Challenges")
+        if r.status_code != 200:
+            print("Failed to fetch challenges")
+            return
+            
+        challenges = r.json().get("data", [])
+        print(f"{'Challenge Key':<45} | Status")
+        print("-" * 60)
+        
+        # Sort by key
+        challenges.sort(key=lambda x: x['key'])
+        
+        for ch in challenges:
+            if ch['solved']:
+                print(f"{ch['key']:<45} | SOLVED")
+                
+    except Exception as e:
+        print(f"Error: {e}")
 
-r = requests.get('http://localhost:3000/api/Challenges')
-data = r.json().get('data', [])
-
-print("Challenge Status:")
-print("=" * 60)
-for key in challenges_to_check:
-    for c in data:
-        if c['key'] == key:
-            status = "SOLVED" if c['solved'] else "NOT SOLVED"
-            print(f"{key}: {status}")
-            break
+if __name__ == "__main__":
+    check_status()

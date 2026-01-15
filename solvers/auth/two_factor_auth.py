@@ -52,11 +52,17 @@ class TwoFactorAuthSolver(BaseSolver):
         creds = {"email": "wurstbrot@juice-sh.op", "password": "EinBelegtesBrotMitSchinkenSCHINKEN!"}
         login_res = self.client.post("/rest/user/login", json=creds)
         
-        if not login_res.ok:
-            logger.error("Login failed for wurstbrot")
-            return False
+        login_data = login_res.json()
         
-        tmp_token = login_res.json().get("authentication", {}).get("token")
+        if login_res.status_code != 200 and login_data.get("status") != "totp_token_required":
+            logger.error(f"Login failed for wurstbrot: {login_res.status_code}")
+            return False
+            
+        tmp_token = login_data.get("data", {}).get("tmpToken")
+        
+        if not tmp_token:
+            logger.error("Could not find tmpToken in login response")
+            return False
         
         # Xác thực 2FA
         totp_code = get_totp_token(totp_secret)

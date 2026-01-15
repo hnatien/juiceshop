@@ -37,20 +37,39 @@ class CodingChallengeSolver(BaseSolver):
 
         return True # We optimistically return True if we attempted
     
-    def is_solved_verified(self) -> bool:
-        # Verification for coding challenges uses scores or just checking if `codingChallengeStatus` > 0
-        # in /api/Challenges.
-        # codingChallengeStatus: 0 (none), 1 (find it solved), 2 (fix it solved).
+    def run(self):
+        logger.info(f"Attempting coding challenge: {self.challenge_key}")
+        
+        # Check coding status specifically
+        # codingChallengeStatus: 0 (none), 1 (find it solved), 2 (fix it solved)
+        # Fix It is considered complete.
+        current_status = self.get_coding_status()
+        if current_status >= 2:
+            logger.success(f"Coding challenge for '{self.challenge_key}' is ALREADY SOLVED (Fix It completed).")
+            return
+
+        try:
+            self.solve()
+            # Verification
+            new_status = self.get_coding_status()
+            if new_status > current_status:
+                logger.success(f"Coding challenge for '{self.challenge_key}' improved from {current_status} to {new_status}!")
+            else:
+                logger.warning(f"Coding challenge for '{self.challenge_key}' attempted but status remained {new_status}.")
+        except Exception as e:
+            logger.error(f"Error running coding solver for '{self.challenge_key}': {e}")
+
+    def get_coding_status(self) -> int:
         try:
             res = self.client.get("/api/Challenges")
             if res.status_code == 200:
                 challenges = res.json().get("data", [])
                 for ch in challenges:
                     if ch.get("key") == self.challenge_key:
-                        # We consider it "Solved" if status is 2 (Fixed) or if it only had Find It.
-                        # But simpler check: if we just ran it, we hope it worked.
-                        status = ch.get("codingChallengeStatus", 0)
-                        return status >= 1
-        except:
-            pass
-        return False
+                        return ch.get("codingChallengeStatus", 0)
+        except Exception as e:
+            logger.debug(f"Failed to get coding status for {self.challenge_key}: {e}")
+        return 0
+    
+    def is_solved_verified(self) -> bool:
+        return self.get_coding_status() >= 1
