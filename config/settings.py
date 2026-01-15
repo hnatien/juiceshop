@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     PROXY_URL: str | None = None
     
     # Path to the Juice Shop source code (required for coding challenges)
-    JUICE_SHOP_SOURCE_PATH: Path = Path("d:/Downloads/juice-shop-master")
+    JUICE_SHOP_SOURCE_PATH: Path = Path(__file__).resolve().parent.parent / "juice-shop-master"
 
     class Config:
         env_file = ".env"
